@@ -46,18 +46,18 @@ deriv-clone/
 │       └── management/commands/
 │           ├── seed_market.py     # instruments + candle backfill
 │           └── run_engine.py      # standalone engine (scale-out mode)
-└── frontend/                      # (scaffold included; components/pages are the next step)
+└── frontend/                      # React 18 + Vite + Bootstrap 5 + lightweight-charts
     ├── index.html                 # Bootstrap Icons CDN
     ├── package.json  vite.config.js  .env.example
     └── src/
-        ├── main.jsx
-        ├── App.jsx
-        ├── services/   api.js  socket.js
-        ├── context/    AuthContext.jsx  TradingContext.jsx      (next)
-        ├── components/ TopBar, SymbolSelector, ChartToolbar, PriceChart, DrawingLayer,
-        │               TradePanel, ContractTypeMenu, PositionsDrawer, AccountSwitcher,
-        │               CashierModal                              (next)
-        └── pages/      Trade, Login, Register, Positions, Reports, Cashier   (next)
+        ├── main.jsx  App.jsx  styles.css  constants.js  utils.js
+        ├── services/    api.js (axios + JWT refresh)  socket.js (auto-reconnect websocket)
+        ├── context/     AuthContext.jsx  TradingContext.jsx (symbols, accounts, open contracts, ticks, toasts)
+        ├── components/  Layout, Sidebar, TopBar, AccountSwitcher, SymbolSelector, ContractTypeMenu,
+        │                PriceChart (eased live ticks), DrawingLayer (canvas tools), ChartToolbar,
+        │                TradePanel, Stepper, ContractRow, PositionsDrawer,
+        │                CashierForm, CashierModal, Modal, ToastHost
+        └── pages/       Trade, Login, Register, Positions, Reports, Cashier
 ```
 
 ## Run it
@@ -118,6 +118,6 @@ Client → `{"action":"subscribe","symbols":["1HZ100V"]}` · `unsubscribe` · `p
 Server → `{"msg":"tick","symbol","epoch","quote","digit"}` · `{"msg":"contract",…}` · `{"msg":"balance",…}`
 
 ## Roadmap
-1. Frontend components/pages (next message): chart with smooth interpolation, drawing layer, trade panel per contract type.
+1. Frontend polish: indicators (SMA/EMA/RSI), contract-result modal, i18n, mobile bottom-sheet trade panel.
 2. Payments go-live checklist: KYC, AML limits, withdrawal method matching, reconciliation job for pending transactions.
 3. Real feeds, market hours, deal cancellation, tests (pytest) and Dockerfile/compose.

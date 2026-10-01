@@ -148,6 +148,7 @@ class StatementView(generics.ListAPIView):
 
 class DrawingViewSet(viewsets.ModelViewSet):
     serializer_class = DrawingSerializer
+    pagination_class = None
 
     def get_queryset(self):
         qs = Drawing.objects.filter(user=self.request.user)

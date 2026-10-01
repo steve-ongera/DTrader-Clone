@@ -13,6 +13,18 @@ export const tokens = {
   clear() { localStorage.removeItem("dt_access"); localStorage.removeItem("dt_refresh"); },
 };
 
+/** Refresh the access token if it expires within a minute (used before opening the websocket). */
+export async function ensureFreshToken(force = false) {
+  if (!tokens.refresh) return;
+  let exp = 0;
+  try { exp = JSON.parse(atob(tokens.access.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))).exp * 1000; } catch { /* expired/invalid */ }
+  if (!force && exp - Date.now() > 60000) return;
+  try {
+    const r = await axios.post(`${API}/auth/refresh/`, { refresh: tokens.refresh });
+    tokens.set(r.data);
+  } catch { tokens.clear(); }
+}
+
 const http = axios.create({ baseURL: API, timeout: 15000 });
 
 http.interceptors.request.use((cfg) => {
@@ -44,6 +56,8 @@ export const errorMessage = (e) =>
   Object.values(e.response?.data || {}).flat().join(" ") ||
   e.message;
 
+const page = (d) => (Array.isArray(d) ? { results: d, count: d.length } : d);
+
 export const auth = {
   register: (d) => http.post("/auth/register/", d).then((r) => r.data),
   login: async (email, password) => {
@@ -69,14 +83,13 @@ export const trade = {
   proposal: (body) => http.post("/trade/proposal/", body).then((r) => r.data),
   buy: (body) => http.post("/trade/buy/", body).then((r) => r.data),
   sell: (id) => http.post(`/trade/sell/${id}/`).then((r) => r.data),
-  contracts: (params) => http.get("/contracts/", { params }).then((r) => r.data),
-  statement: (params) => http.get("/statement/", { params }).then((r) => r.data),
+  contracts: (params) => http.get("/contracts/", { params }).then((r) => page(r.data)),
+  statement: (params) => http.get("/statement/", { params }).then((r) => page(r.data)),
 };
 
 export const drawings = {
   list: (symbol) => http.get("/drawings/", { params: { symbol } }).then((r) => r.data),
   create: (d) => http.post("/drawings/", d).then((r) => r.data),
-  update: (id, d) => http.patch(`/drawings/${id}/`, d).then((r) => r.data),
   remove: (id) => http.delete(`/drawings/${id}/`),
 };
 

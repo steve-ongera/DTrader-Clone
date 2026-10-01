@@ -76,6 +76,8 @@ else:  # single-process dev mode: engine is embedded in the ASGI server
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": ["rest_framework_simplejwt.authentication.JWTAuthentication"],
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 50,
     "DEFAULT_THROTTLE_CLASSES": ["rest_framework.throttling.UserRateThrottle",
                                  "rest_framework.throttling.AnonRateThrottle"],
     "DEFAULT_THROTTLE_RATES": {"user": "600/min", "anon": "60/min"},
